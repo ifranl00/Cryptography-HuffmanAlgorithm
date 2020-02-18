@@ -1,16 +1,16 @@
 package practica1;
 
 public class Simbolo {
-	char simbolo;
+	String simbolo;
 	int frec;
 	float prob;
-	public Simbolo(char simbolo, int frec, float prob) {
+	public Simbolo(String simbolo, int frec, float prob) {
 		this.simbolo = simbolo;
 		this.frec = frec;
 		this.prob = prob;
 	}
 	
-	public char getSim() {
+	public String getSim() {
 		return this.simbolo;
 	}
 	public int getFrec() {
@@ -18,15 +18,5 @@ public class Simbolo {
 	}
 	public float getProb() {
 		return this.prob;
-	}
-	
-	public void setSim(char sim) {
-		this.simbolo = sim;
-	}
-	public void setFrec(int frec) {
-		this.frec = frec;
-	}
-	public void setProb(float prob) {
-		this.prob = prob;
 	}
 }
