@@ -1,86 +1,45 @@
 package practica1;
 
+
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 
+import tree.BinarySearchTreeADTImpl;
+
 public class Main {
 	static String abe="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	
 	public static void main(String[] args) {
-		String txt = "La noche cae, brumosa ya y morada.  Vagas claridades malvas y verdes perduran tras la torre de la iglesia.  El camino sube, lleno de sombras, de campanillas, de fragancia de hierba,  de canciones, de cansancio y de anhelo.";
-		int long_total = txt.length();
-		/*
-		String aux = "";
-		ArrayList<String> txt2 = new ArrayList<String>();
-		for (int i = 0; i < long_total; i++) {
-			if(i%2==0) {
-				aux =  ""+txt.charAt(i);
-			}else if(i%2!= 0) {
-				aux = aux+""+ txt.charAt(i);
-				txt2.add(aux);
-				aux = "";
-			}
-		}*/
-		/* ALFABETO FUENTE EJERCICIO EXTRA */
-		/*
-		ArrayList<String> abe2 = new ArrayList<String>();
-		for (int i = 0; i < txt2.size(); i++) {
-			if(!abe2.contains(txt2.get(i))) {
-				abe2.add(txt2.get(i));
-			}
-		}
-		
-		
-		int long_total2 = txt2.size(); // longitud del texto
-		ArrayList<Integer> frec2 = new ArrayList<Integer>();
-		frec2 = cuentaSimbolos(long_total2,txt2,abe2);
-		ArrayList<Float> probs2 = new ArrayList<Float>();
-		probs2 = calculaProbabilidades(frec2, long_total);
-		
-		ArrayList<Simbolo> fuente2 = new ArrayList<Simbolo>();
-		String s = "";
-		for (int i = 0; i < frec2.size(); i++) {
-			s = abe2.get(i);
-			fuente2.add(new Simbolo(s,frec2.get(i),probs2.get(i)));
-		}
-		ordena(fuente2);
-		for (int i = 0; i < fuente2.size(); i++) {
-			System.out.println(fuente2.get(i).getSim()+" "+fuente2.get(i).getFrec()+" "+fuente2.get(i).getProb());
-		}
-		
-		
-		*/
-		/* EJERCICIOS 1 Y 2*/
 		abe = abe + abe.toLowerCase()+"., ";
-		ArrayList<Integer> frec = new ArrayList<Integer>();
-		frec = cuentaSimbolos(long_total,txt,abe);
-		ArrayList<Float> probs = new ArrayList<Float>();
-		probs = calculaProbabilidades(frec, long_total);
 		
-		abe = abe + abe.toLowerCase()+"., ";
+		String texto = leeTexto("C:\\Users\\alumno\\Desktop\\P2\\textos\\datos_02_texto.txt");
+
+		ArrayList<Integer> frec = cuentaSimbolos(texto.length(),texto,abe);
+		ArrayList<Float> prob = calculaProbabilidades(frec, texto.length());
 		ArrayList<Simbolo> fuente = new ArrayList<Simbolo>();
+		
+		
+		
 		String s = "";
 		for (int i = 0; i < frec.size(); i++) {
 			s = ""+abe.charAt(i);
-			fuente.add(new Simbolo(s,frec.get(i),probs.get(i)));
+			fuente.add(new Simbolo(s,frec.get(i),prob.get(i)));
 			
 		}
 		ordena(fuente);
 		for (int i = 0; i < fuente.size(); i++) {
 			System.out.println(fuente.get(i).getSim()+" "+fuente.get(i).getFrec()+" "+fuente.get(i).getProb());
 		}
+		double entropia = calculaEntropia(fuente);
+		System.out.println("Entropia: "+entropia);
 		
-		
+		initialTree(fuente);
+ 		
 	}
-	
-	/*public static ArrayList<Integer> cuentaSimbolos2(){
-		
-		ArrayList<String> list_aux = new ArrayList<String>();
-		
-		return null;
-	}*/
 	
 	
 	public static ArrayList<Integer> cuentaSimbolos(int long_total, String txt, String abe) {
@@ -141,6 +100,68 @@ public class Main {
 				return Float.compare(s2.getProb(), s1.getProb());
 			}
 		});
+	}
+	
+	public static String leeTexto(String dir) {
+		String texto="";
+		try {
+			BufferedReader r = new BufferedReader(new FileReader(dir));
+			String tmp ="";
+			String bfread;
+			
+			while((bfread = r.readLine())!=null) {
+			
+				tmp = tmp+bfread+"  ";
+			}
+			
+			tmp = tmp.substring(0, tmp.length()-2);
+			texto = tmp;
+			
+		}catch(Exception e) {
+			System.err.println(e.getMessage());
+		}
+		return texto;
+	}
+	
+	public static double calculaEntropia(ArrayList<Simbolo> fuente) {
+		double e = 0;//ENTROPIA
+		double totalFrec =(double) sumaTotalFrec(fuente);
+		double sumatorio = 0;
+		for (int i = 0; i < fuente.size(); i++) {
+			if(fuente.get(i).getFrec()!=0) {
+			sumatorio = sumatorio + (fuente.get(i).getFrec()*logaritmo(fuente.get(i).getFrec()));
+			}
+		}
+		e = e + (Math.log(totalFrec)/Math.log((double)2))-(1/totalFrec)*sumatorio; 
+		return e;
+	}
+	
+	public static int sumaTotalFrec(ArrayList<Simbolo> fuente) {
+		int total = 0;
+		for (int i = 0; i < fuente.size(); i++) {
+			total = total + fuente.get(i).getFrec();
+		}
+		return total;
+	}
+	
+	public static double logaritmo(int f) {
+		return (Math.log(f)/Math.log(2));
+	}
+	
+	public static void initialTree(ArrayList<Simbolo> f) {
+		ArrayList<BinarySearchTreeADTImpl<Integer>> ini = new ArrayList<BinarySearchTreeADTImpl<Integer>>();
+		BinarySearchTreeADTImpl<Integer> node = null;
+		for (int i = 0; i < f.size(); i++) {
+			if(f.get(i).getFrec() != 0) {
+				node = new BinarySearchTreeADTImpl<Integer>();
+				node.setContent(f.get(i).getFrec());
+				ini.add(node);
+			}
+		}
+		
+		for (int i = 0; i < ini.size(); i++) {
+			System.out.println(ini.get(i).toString());
+		}
 	}
 
 }
