@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 
-import tree.BinarySearchTreeADTImpl;
 
 public class Main {
 	static String abe="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -16,11 +15,13 @@ public class Main {
 	public static void main(String[] args) {
 		abe = abe + abe.toLowerCase()+"., ";
 		
-		String texto = leeTexto("C:\\Users\\alumno\\Desktop\\P2\\textos\\datos_02_texto.txt");
+		/* CAMBIAR DIRECCION DEPENDIENDO DEL PC */
+		String texto = leeTexto("/home/dona/eclipse-workspace/P2/src/textos/datos_02_texto.txt");
 
 		ArrayList<Integer> frec = cuentaSimbolos(texto.length(),texto,abe);
 		ArrayList<Float> prob = calculaProbabilidades(frec, texto.length());
 		ArrayList<Simbolo> fuente = new ArrayList<Simbolo>();
+		ArrayList<Node> arbol = new ArrayList<Node>(); 
 		
 		
 		
@@ -31,13 +32,18 @@ public class Main {
 			
 		}
 		ordena(fuente);
+		
+		System.out.println("S/ F/ P");
 		for (int i = 0; i < fuente.size(); i++) {
 			System.out.println(fuente.get(i).getSim()+" "+fuente.get(i).getFrec()+" "+fuente.get(i).getProb());
 		}
+		
+		System.out.println("\nCALCULOS:");
 		double entropia = calculaEntropia(fuente);
 		System.out.println("Entropia: "+entropia);
 		
-		initialTree(fuente);
+		arbol = initialTree(fuente);
+		construyeHuffmann(arbol, sumaTotalFrec(fuente));
  		
 	}
 	
@@ -148,20 +154,62 @@ public class Main {
 		return (Math.log(f)/Math.log(2));
 	}
 	
-	public static void initialTree(ArrayList<Simbolo> f) {
-		ArrayList<BinarySearchTreeADTImpl<Integer>> ini = new ArrayList<BinarySearchTreeADTImpl<Integer>>();
-		BinarySearchTreeADTImpl<Integer> node = null;
+	public static ArrayList<Node> initialTree(ArrayList<Simbolo> f) {
+		ArrayList<Node> ini = new ArrayList<Node>();
+		Node node = null;
 		for (int i = 0; i < f.size(); i++) {
 			if(f.get(i).getFrec() != 0) {
-				node = new BinarySearchTreeADTImpl<Integer>();
+				node = new Node();
 				node.setContent(f.get(i).getFrec());
 				ini.add(node);
 			}
 		}
 		
-		for (int i = 0; i < ini.size(); i++) {
-			System.out.println(ini.get(i).toString());
+		return ini;
+	}
+	/*
+	 * 1) ENCONTRAR 2 MAS PEQUEÑOS
+	 * 2) SUMA Y NODO NUEVO
+	 * 3) REPETIR HASTA QUE SE ALCANCE EL NUMERO TOTAL DE LA
+	 * SUMA DE LAS FRECUENCIAS*/
+	
+	public static void construyeHuffmann(ArrayList<Node> arbolInicial, int totalFrec) {
+		Node aux = new Node();
+		Node aux2 = new Node();
+		while(aux.getContent() < totalFrec) {
+			aux = escogerMenor(arbolInicial);
+			aux2 = escogerMenor(arbolInicial);
+			
+			crearNodoIntermedio((aux.getContent()+aux2.getContent()), aux, aux2);
 		}
+	}
+	
+	private static void crearNodoIntermedio(int frec, Node r, Node l) {
+		Node u = new Node(frec);
+		u.setLeft(l);
+		u.setRight(r);
+		u.getLeft().setCode("0");
+		u.getRight().setCode("1");
+	}
+	
+	private static Node escogerMenor(ArrayList<Node> arbol) {
+		Node min = arbol.get(0);
+		boolean found  = false;
+		int i = 0;
+		while(i < arbol.size() && found == false) {
+			
+		}
+			
+			/* ESTO CONSIGUE EL MINIMO DEL ARRAY PERO CLARO
+			 * HACE FALTA MIRAR LOS NODOS DE ABAJO Y ME CAGO EN MIS PUTOS MUERTOS
+			if(min.getContent() > arbol.get(i).getContent()) {
+				if(!arbol.get(i).wasVisited()) {
+					min = arbol.get(i);
+				}	
+			}*/	
+		
+		min.setVisited();
+		return min;
 	}
 
 }
