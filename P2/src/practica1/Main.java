@@ -16,7 +16,7 @@ public class Main {
 		abe = abe + abe.toLowerCase()+"., ";
 		
 		/* CAMBIAR DIRECCION DEPENDIENDO DEL PC */
-		String texto = leeTexto("/home/dona/eclipse-workspace/P2/src/textos/datos_02_texto.txt");
+		String texto = leeTexto("C:\\Users\\irene\\git\\SeguridadInformatica\\P2\\src\\practica1\\textos\\datos_02.txt");
 
 		ArrayList<Integer> frec = cuentaSimbolos(texto.length(),texto,abe);
 		ArrayList<Float> prob = calculaProbabilidades(frec, texto.length());
@@ -180,7 +180,13 @@ public class Main {
 			aux = escogerMenor(arbolInicial);
 			aux2 = escogerMenor(arbolInicial);
 			
+			if(aux == aux2 && aux.getContent() == totalFrec)
 			crearNodoIntermedio((aux.getContent()+aux2.getContent()), aux, aux2);
+		}
+		
+		for(int i = 0; i < arbolInicial.size(); i++) {
+			
+			System.out.println(arbolInicial.get(i).toString());
 		}
 	}
 	
@@ -194,12 +200,38 @@ public class Main {
 	
 	private static Node escogerMenor(ArrayList<Node> arbol) {
 		Node min = arbol.get(0);
-		boolean found  = false;
-		int i = 0;
-		while(i < arbol.size() && found == false) {
+		Node aux = null;
+		Node auxSons = null;
+		
+		for(int i = 0; i < arbol.size();i++){
+			aux = arbol.get(i);
+				
+				if(min.getContent() > aux.getContent()) {
+					
+					if(!aux.wasVisited()) {
+						min = aux;
+					}	
+					
+				}
+				
+				if(aux.hasSon()) {
+					auxSons = aux.getSon();
+					
+					while(auxSons.hasSon()) {
+						if(min.getContent() > auxSons.getContent()) {
+							
+							if(!auxSons.wasVisited()) {
+								min = auxSons;
+							}	
+							
+						}
+						
+						auxSons = auxSons.getSon();
+					}
+				}
 			
 		}
-			
+		
 			/* ESTO CONSIGUE EL MINIMO DEL ARRAY PERO CLARO
 			 * HACE FALTA MIRAR LOS NODOS DE ABAJO Y ME CAGO EN MIS PUTOS MUERTOS
 			if(min.getContent() > arbol.get(i).getContent()) {

@@ -69,7 +69,7 @@ public class Node {
 
 	/* BASICO */
 	public boolean isEmpty() {
-		return (this.frecuencia == 0);
+		return (this == null);
 	}
 	
 	public boolean isLeaf() {
@@ -82,5 +82,20 @@ public class Node {
 	
 	public boolean hasSon() {
 		return (this.son != null);
+	}
+	
+	public Node getSon() {
+		
+		return this.son;
+	}
+	
+	public String toString() {
+		
+		StringBuilder s =  new StringBuilder();
+		
+		s.append(this.frecuencia).append(this.codigo).append(visited);
+		
+		return s.toString();
+		
 	}
 }
